@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Transfer Sessions</title>
+  <script>
+  (function(){try{var s=localStorage.getItem('kt-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-wordmark">
+          <span class="logo-line">Transformation Office</span>
+          <span class="logo-title">Knowledge Sphere</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Sessions</a>
+        <a href="/calendar.html" class="nav-link">Calendar</a>
+        <a href="/submit.html" class="nav-link">Submit Session</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme">
+          <svg data-theme-icon="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg data-theme-icon="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Knowledge Transfer Sessions</h1>
+      <p>Discover and attend knowledge transfer sessions shared by your colleagues. Learn from experts across the organization.</p>
+      <a href="/submit.html" class="btn btn-primary">Submit a Session</a>
+    </div>
+  </section>
+
+  <!-- Sessions Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Upcoming Sessions</h2>
+        <div class="search-wrapper">
+          <input type="text" id="search-input" class="search-input" placeholder="Search sessions...">
+        </div>
+      </div>
+
+      <div id="sessions-grid" class="grid grid-3">
+        <!-- Sessions will be loaded here -->
+      </div>
+
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+        <h3 id="empty-state-title">No sessions available</h3>
+        <p id="empty-state-message">Check back later for upcoming knowledge transfer sessions, or submit your own!</p>
+        <a href="/submit.html" class="btn btn-primary mt-md">Submit a Session</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Session Detail Modal -->
+  <div id="modal-session" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title" id="modal-session-title">Session Details</h3>
+          <p class="modal-subtitle" id="modal-session-subtitle"></p>
+          <button type="button" class="btn btn-secondary btn-small" id="modal-download-png" onclick="downloadSessionModalPng()">Download as PNG</button>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-session')">&times;</button>
+      </div>
+      <div id="modal-session-content" class="modal-body">
+        <!-- Session details loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="modal-feedback" class="modal-overlay">
+    <div class="modal modal-feedback">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title">Session Feedback</h3>
+          <p class="modal-subtitle" id="modal-feedback-session-title"></p>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-feedback')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="feedback-form" onsubmit="submitFeedback(event)">
+          <input type="hidden" id="feedback-session-id">
+          <div class="form-group">
+            <label for="feedback-name">Your Name</label>
+            <input type="text" id="feedback-name"  placeholder="Enter your name">
+          </div>
+          <div class="form-group">
+            <label>Rating</label>
+            <div class="star-rating" id="star-rating">
+              <button type="button" class="star" data-value="1">&#9733;</button>
+              <button type="button" class="star" data-value="2">&#9733;</button>
+              <button type="button" class="star" data-value="3">&#9733;</button>
+              <button type="button" class="star" data-value="4">&#9733;</button>
+              <button type="button" class="star" data-value="5">&#9733;</button>
+            </div>
+            <input type="hidden" id="feedback-rating" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-comment">Comment <span class="optional-label">(optional)</span></label>
+            <textarea id="feedback-comment" placeholder="Share your thoughts about this session..." rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="feedback-submit-btn">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SCB Transformation Office Knowledge Sphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/theme.js" defer></script>
+  <script src="/vendor/html-to-image.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

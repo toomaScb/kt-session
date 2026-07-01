@@ -1,0 +1,352 @@
+/* Calendar — matches DESIGN.md tokens via style.css variables */
+
+.hero-small {
+  padding: var(--space-6) 0 var(--space-8);
+}
+
+.hero-small h1 {
+  margin-bottom: var(--space-2);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.calendar-title {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  min-width: 200px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.calendar-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-muted);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.weekday {
+  padding: var(--space-3);
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  min-height: 100px;
+  border-right: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+  padding: var(--space-2);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background-color: var(--bg-muted);
+}
+
+.calendar-day.other-month {
+  background-color: var(--bg-muted);
+  opacity: 0.55;
+}
+
+.calendar-day.today {
+  background-color: color-mix(in srgb, var(--color-fin) 8%, var(--bg-card));
+}
+
+.calendar-day.has-sessions {
+  background-color: color-mix(in srgb, var(--color-fin) 12%, var(--bg-card));
+}
+
+.calendar-day.has-sessions:hover {
+  background-color: color-mix(in srgb, var(--color-fin) 18%, var(--bg-card));
+}
+
+.calendar-day.is-holiday {
+  background-color: color-mix(in srgb, var(--color-report-red) 8%, var(--bg-card));
+}
+
+.calendar-day.is-holiday:hover {
+  background-color: color-mix(in srgb, var(--color-report-red) 14%, var(--bg-card));
+}
+
+.calendar-day.selected {
+  background-color: color-mix(in srgb, var(--color-fin) 22%, var(--bg-card));
+  box-shadow: inset 0 0 0 2px var(--color-fin);
+}
+
+.day-number {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.other-month .day-number {
+  color: var(--text-secondary);
+}
+
+.today .day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--text-primary);
+  color: var(--bg-elevated);
+  border-radius: var(--radius-button);
+}
+
+.day-sessions-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-fin);
+  border-radius: var(--radius-pill);
+}
+
+.session-dot.secondary {
+  background-color: var(--text-tertiary);
+}
+
+.day-sessions-preview {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: var(--space-xs);
+}
+
+.day-sessions-preview strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Holiday indicator */
+.holiday-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 4px 6px;
+  background: color-mix(in srgb, var(--color-report-red) 12%, var(--bg-card));
+  border-radius: var(--radius-button);
+  margin-top: var(--space-xs);
+}
+
+.holiday-indicator svg {
+  flex-shrink: 0;
+  color: var(--color-report-red);
+}
+
+.holiday-indicator .holiday-name {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-report-red);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Holiday state in day panel */
+.holiday-state {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--text-secondary);
+}
+
+.holiday-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  color: var(--color-report-red);
+}
+
+.holiday-state h4 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+  color: var(--color-report-red);
+}
+
+.holiday-state p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.day-sessions-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--bg-elevated);
+  border-left: 1px solid var(--border-default);
+  box-shadow: var(--shadow-modal);
+  z-index: 1001;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-sessions-panel.active {
+  transform: translateX(0);
+}
+
+.day-sessions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 3px solid var(--color-fin);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.day-sessions-header .modal-close {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.day-sessions-header .modal-close:hover {
+  background: var(--bg-muted);
+}
+
+.day-sessions-title {
+  font-size: 1.125rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-xs);
+  color: var(--text-primary);
+}
+
+.day-sessions-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.day-sessions-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+
+.day-session-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.day-session-card:hover {
+  border-color: var(--color-warm-sand);
+  transform: translateY(-1px);
+}
+
+.day-session-card-title {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.day-session-card-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.day-session-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.day-empty-state {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--text-secondary);
+}
+
+.day-empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  opacity: 0.45;
+  stroke: var(--text-secondary);
+}
+
+.day-empty-state h4 {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 70px;
+    padding: var(--space-xs);
+  }
+
+  .day-number {
+    font-size: 0.8125rem;
+  }
+
+  .day-sessions-preview {
+    display: none;
+  }
+
+  .weekday {
+    padding: var(--space-2);
+    font-size: 0.625rem;
+  }
+
+  .day-sessions-panel {
+    width: 100%;
+  }
+}

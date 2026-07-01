@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Knowledge Transfer Sessions</title>
+  <script>
+  (function(){try{var s=localStorage.getItem('kt-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-wordmark">
+          <span class="logo-line">Transformation Office</span>
+          <span class="logo-title">Knowledge Sphere</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Sessions</a>
+        <a href="/calendar.html" class="nav-link">Calendar</a>
+        <a href="/submit.html" class="nav-link">Submit Session</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme">
+          <svg data-theme-icon="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg data-theme-icon="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container" style="max-width: 400px;">
+      <div class="text-center mb-lg">
+        <h2>Admin Login</h2>
+        <p class="text-secondary">Sign in to manage KT requests</p>
+      </div>
+
+      <div id="alert-error" class="alert alert-error" style="display: none;">
+        Invalid username or password.
+      </div>
+
+      <form id="login-form" class="card">
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-input" placeholder="Enter username" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Enter password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SCB Transformation Office Knowledge Sphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/theme.js" defer></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

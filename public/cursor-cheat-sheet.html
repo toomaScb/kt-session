@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor Token Optimization Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --border: #dfe3ec;
+    --accent: #1a4fc4;
+    --accent2: #0f3490;
+    --blue-bright: #2563eb;
+    --cyan: #0891b2;
+    --green: #16a34a;
+    --amber: #d97706;
+    --text: #1e293b;
+    --muted: #64748b;
+    --code-bg: #f1f5f9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    min-height: 100vh;
+    padding: 40px 32px;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,79,196,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,79,196,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .logo-wrap {
+    background: #0033a0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-wrap img {
+    height: 36px;
+    width: auto;
+    display: block;
+  }
+
+  .header-text h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .header-text p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Tool label pill */
+  .tool-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .pill-rtk     { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .pill-parser  { background: rgba(74,222,128,0.12); color: #86efac; border: 1px solid rgba(74,222,128,0.25); }
+  .pill-brv     { background: rgba(251,191,36,0.12); color: #fcd34d; border: 1px solid rgba(251,191,36,0.25); }
+  .pill-mdc     { background: rgba(34,211,238,0.12); color: #67e8f9; border: 1px solid rgba(34,211,238,0.25); }
+  .pill-cave    { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+
+  /* Grid layout */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .grid-2-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    max-width: 66.8%;
+  }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+
+  .card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card h2 .icon {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  /* Code blocks */
+  pre, .cmd {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #334155;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .cmd { margin-bottom: 6px; }
+
+  .kw  { color: #2563eb; }
+  .str { color: #0369a1; }
+  .cm  { color: #6b7fa3; font-style: italic; }
+  .val { color: #16a34a; }
+  .flag { color: #b45309; }
+  .hl  { color: #db2777; }
+
+  /* Inline code */
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #334155;
+  }
+
+  /* Step list */
+  .steps { list-style: none; }
+  .steps li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #374151;
+  }
+
+  .step-num {
+    min-width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Tips */
+  .tip-list { list-style: none; }
+  .tip-list li {
+    font-size: 12.5px;
+    color: #475569;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .tip-list li:last-child { border-bottom: none; }
+  .tip-list li::before { content: '→'; color: var(--blue-bright); flex-shrink: 0; }
+
+  /* Divider label */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin: 24px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Token savings bar */
+  .savings {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .savings-label { font-size: 11px; color: var(--muted); width: 120px; flex-shrink: 0; }
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #1a4fc4, #3b82f6);
+  }
+  .savings-pct { font-size: 11px; font-weight: 700; color: #4ade80; width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* MDC example block */
+  .mdc-example {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .mdc-filename {
+    background: #e8ecf4;
+    padding: 5px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #0891b2;
+    border-bottom: 1px solid var(--border);
+  }
+  .mdc-body {
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.65;
+    color: #334155;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  footer .links { display: flex; gap: 20px; }
+  footer a { color: var(--blue-bright); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media print {
+    body { background: #f4f6fa; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 1024px) {
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+    .grid-4,
+    .workflow-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    div[style*="grid-template-columns:repeat(5,1fr)"] {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 24px 16px;
+    }
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+    }
+    .header-left {
+      gap: 14px;
+    }
+    .header-text h1 {
+      font-size: 22px;
+    }
+    .header-text p {
+      font-size: 12px;
+    }
+    .badge {
+      align-self: flex-start;
+    }
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+    .grid-4,
+    .workflow-grid {
+      grid-template-columns: 1fr;
+    }
+    div[style*="grid-template-columns:repeat(5,1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+    .card {
+      padding: 16px;
+    }
+    .card h2 {
+      font-size: 15px;
+    }
+    pre, .cmd {
+      font-size: 11px;
+      padding: 8px 10px;
+    }
+    .savings {
+      gap: 6px;
+    }
+    .savings-label {
+      width: 90px;
+      font-size: 10px;
+    }
+    footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 14px;
+    }
+    footer .links {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 16px 12px;
+    }
+    .header-text h1 {
+      font-size: 19px;
+    }
+    .logo-wrap {
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+    .logo-wrap img {
+      height: 28px;
+    }
+    .card {
+      padding: 14px;
+      border-radius: 8px;
+    }
+    .card h2 {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    pre, .cmd {
+      font-size: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
+    .tool-pill {
+      font-size: 9px;
+    }
+    .tip-list li {
+      font-size: 12px;
+    }
+    .wf-desc {
+      font-size: 11px;
+    }
+    .wf-title {
+      font-size: 12px;
+    }
+    .wf-rules li {
+      font-size: 11px;
+    }
+    .section-label {
+      font-size: 10px;
+      margin: 18px 0 10px;
+    }
+    footer {
+      font-size: 10px;
+    }
+    footer a {
+      font-size: 10px;
+    }
+  }
+
+  /* Workflow best practices */
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .workflow-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .workflow-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .wf-orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+  .wf-purple::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .wf-blue::before   { background: linear-gradient(90deg, #1a4fc4, #3b82f6); }
+  .wf-green::before  { background: linear-gradient(90deg, #16a34a, #4ade80); }
+
+  .wf-number {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0.12;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .wf-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .wf-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .wf-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .wf-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .tag-orange { background: rgba(249,115,22,0.1); color: #ea580c; border: 1px solid rgba(249,115,22,0.25); }
+  .tag-purple { background: rgba(124,58,237,0.1); color: #7c3aed; border: 1px solid rgba(124,58,237,0.25); }
+  .tag-blue   { background: rgba(26,79,196,0.1);  color: #1a4fc4; border: 1px solid rgba(26,79,196,0.25); }
+  .tag-green  { background: rgba(22,163,74,0.1);  color: #16a34a; border: 1px solid rgba(22,163,74,0.25); }
+
+  .wf-rules { list-style: none; margin-top: 2px; }
+  .wf-rules li {
+    font-size: 11.5px;
+    color: #475569;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    gap: 7px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+  .wf-rules li:last-child { border-bottom: none; }
+  .wf-rules li .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .dot-orange { background: #f97316; }
+  .dot-purple { background: #7c3aed; }
+  .dot-blue   { background: #2563eb; }
+  .dot-green  { background: #16a34a; }
+
+  .context-meter {
+    margin: 10px 0 6px;
+  }
+  .meter-track {
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .meter-safe {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 70%;
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+    border-radius: 8px 0 0 8px;
+  }
+  .meter-warn {
+    position: absolute;
+    left: 70%; top: 0; bottom: 0;
+    width: 15%;
+    background: #fbbf24;
+  }
+  .meter-danger {
+    position: absolute;
+    left: 85%; top: 0; bottom: 0;
+    right: 0;
+    background: #ef4444;
+    border-radius: 0 8px 8px 0;
+  }
+  .meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .meter-labels .safe-lbl  { color: #16a34a; font-weight: 700; }
+  .meter-labels .warn-lbl  { color: #d97706; font-weight: 700; }
+  .meter-labels .reset-lbl { color: #dc2626; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <div class="">
+        <img src="data:image/png;base64,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" alt="Logo" />
+      </div>
+      <div class="">
+        <h1>Cursor Token Optimization</h1>
+        <p>Setup &amp; Usage Cheat Sheet · 2026 Edition</p>
+      </div>
+    </div>
+    <span class="badge">Free Tools</span>
+  </header>
+
+  <!-- Savings overview -->
+  <div class="section-label">Token Savings Overview</div>
+  <div class="card" style="margin-bottom:20px; padding: 16px 22px;">
+    <div class="savings">
+      <span class="savings-label">rtk (CLI output)</span>
+      <div class="bar-track"><div class="bar-fill" style="width:89%"></div></div>
+      <span class="savings-pct">~89%</span>
+    </div>
+    <div class="savings">
+      <span class="savings-label">code-parser (files)</span>
+      <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
+      <span class="savings-pct">~70%</span>
+    </div>
+    <div class="savings">
+      <span class="savings-label">byterover (memory)</span>
+      <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
+      <span class="savings-pct">~60%</span>
+    </div>
+    <div class="savings">
+      <span class="savings-label">Modular .mdc rules</span>
+      <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+      <span class="savings-pct">~50%</span>
+    </div>
+    <div class="savings">
+      <span class="savings-label">caveman (responses)</span>
+      <div class="bar-track"><div class="bar-fill" style="width:75%"></div></div>
+      <span class="savings-pct">~75%</span>
+    </div>
+  </div>
+
+  <!-- 4 tool cards: top row 3, bottom row 2 -->
+  <div class="section-label">Setup &amp; Usage</div>
+  <div class="grid-2">
+
+    <!-- RTK -->
+    <div class="card">
+      <div class="tool-pill pill-rtk">① RTK · Rust Token Killer</div>
+      <h2><span class="icon">⚡</span> CLI Output Compression (60–90%)</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Intercepts shell command output and compresses it before it reaches your LLM context. Single Rust binary, zero dependencies.</p>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;">Install</div>
+      <pre><span class="cm"># macOS / Linux</span>
+curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+<span class="cm"># or macOS homebrew</span>
+brew install rtk</pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Init for Cursor</div>
+      <pre><span class="kw">rtk</span> <span class="flag">init -g --agent cursor</span>
+<span class="cm"># Restart Cursor after this</span></pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Common Usage</div>
+      <pre><span class="kw">rtk</span> git status        <span class="cm"># ~2000 → ~200 tokens</span>
+<span class="kw">rtk</span> cargo test        <span class="cm"># strips test pass noise</span>
+<span class="kw">rtk</span> ls .              <span class="cm"># token-optimized tree</span>
+<span class="kw">rtk</span> read file.rs      <span class="cm"># smart file reading</span>
+<span class="kw">rtk</span> read file.rs <span class="flag">-l aggressive</span>  <span class="cm"># sigs only</span>
+<span class="kw">rtk</span> grep <span class="str">"pattern"</span> . <span class="cm"># grouped results</span>
+<span class="kw">rtk</span> gain              <span class="cm"># see your savings</span>
+<span class="kw">rtk</span> discover          <span class="cm"># find missed savings</span></pre>
+
+      <ul class="tip-list" style="margin-top:10px;">
+        <li>Hook auto-rewrites bash commands — no manual prefix needed after init</li>
+        <li>Errors &amp; failures are always preserved — only noise is stripped</li>
+        <li>Windows: extract zip, add to PATH, use <code>rtk init -g --agent cursor</code> in Cursor rule</li>
+      </ul>
+    </div>
+
+    <!-- code-parser -->
+    <div class="card">
+      <div class="tool-pill pill-parser">② code-parser · M97chahboun</div>
+      <h2><span class="icon">🔬</span> Structural Code Analysis</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Fast Rust CLI that statically analyses source files and returns a structured JSON map of every class, interface, mixin, enum, and method with exact line ranges — without executing code.</p>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;">Install</div>
+      <pre><span class="cm"># Via cargo</span>
+cargo install --git https://github.com/M97chahboun/code-parser
+
+<span class="cm"># Or download binary from releases</span>
+<span class="cm"># github.com/M97chahboun/code-parser/releases</span></pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Usage</div>
+      <pre><span class="cm"># Parse a single file</span>
+code-parser src/main.rs
+
+<span class="cm"># Parse entire directory</span>
+code-parser src/
+
+<span class="cm"># Output to file for Cursor context</span>
+code-parser src/ > .cursor/codebase-map.json</pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Use in Cursor</div>
+      <pre><span class="cm"># Reference the map instead of raw files</span>
+<span class="cm"># In chat: "@.cursor/codebase-map.json"</span>
+<span class="cm"># Sends structure, not full file bodies</span></pre>
+
+      <ul class="tip-list" style="margin-top:10px;">
+        <li>Returns line ranges per symbol — LLM can ask for only the methods it needs</li>
+        <li>No runtime execution — safe for any codebase, any language</li>
+        <li>Regenerate the map after major refactors: <code>code-parser src/ > .cursor/codebase-map.json</code></li>
+        <li>Supports Dart, Rust, Python, TypeScript and more</li>
+      </ul>
+    </div>
+
+  </div><!-- end grid-2 top row -->
+
+  <div class="grid-2">
+
+    <!-- Byterover -->
+    <div class="card">
+      <div class="tool-pill pill-brv">③ Byterover · brv CLI</div>
+      <h2><span class="icon">🧠</span> Persistent Memory Layer</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Gives AI agents persistent, structured memory across sessions. Curate project knowledge into a context tree so Cursor doesn't re-learn your codebase every session.</p>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;">Install</div>
+      <pre><span class="kw">npm</span> install -g byterover-cli
+<span class="cm"># or</span>
+<span class="kw">pip</span> install byterover</pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Connect to Cursor</div>
+      <pre><span class="kw">brv</span> init               <span class="cm"># start interactive REPL</span>
+<span class="kw">brv</span> webui              <span class="cm"># open dashboard</span>
+<span class="kw">brv</span> status             <span class="cm"># check project status</span>
+<span class="cm"># Byterover auto-picks connector type for Cursor</span>
+<span class="cm"># (Skill connector — no config needed)</span></pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Curate Knowledge</div>
+      <pre><span class="kw">brv</span> curate <span class="str">"Auth uses JWT with 24h expiry"</span> @src/middleware/auth.ts
+<span class="kw">brv</span> curate <span class="str">"DB is PostgreSQL, ORM is Drizzle"</span>
+<span class="kw">brv</span> query  <span class="str">"How is auth implemented?"</span>
+<span class="kw">brv</span> curate view        <span class="cm"># see stored knowledge</span></pre>
+
+      <ul class="tip-list" style="margin-top:10px;">
+        <li>Curate arch decisions, patterns, and constraints once — retrieved automatically</li>
+        <li>Works locally by default — cloud sync available for teams</li>
+        <li>Free tier available at <code>byterover.dev</code></li>
+      </ul>
+    </div>
+
+    <!-- Modular MDC -->
+    <div class="card">
+      <div class="tool-pill pill-mdc">④ Modular .mdc Rules · Built-in</div>
+      <h2><span class="icon">📐</span> Scoped Context Rules (Free)</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Replace a single monolithic <code>.cursorrules</code> with modular <code>.mdc</code> files that only load when relevant. Each always-apply rule costs tokens on every prompt — scope them.</p>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;">Folder Structure</div>
+      <pre>.cursor/rules/
+├── <span class="val">core.mdc</span>         <span class="cm"># always-on, keep &lt;300 lines</span>
+├── <span class="hl">testing.mdc</span>      <span class="cm"># globs: **/*.test.ts</span>
+├── <span class="hl">api.mdc</span>          <span class="cm"># globs: src/routes/**</span>
+├── <span class="hl">ui.mdc</span>           <span class="cm"># globs: src/components/**</span>
+└── <span class="hl">security.mdc</span>     <span class="cm"># globs: **/*.auth.*</span></pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Example .mdc frontmatter</div>
+      <div class="mdc-example">
+        <div class="mdc-filename">.cursor/rules/testing.mdc</div>
+        <div class="mdc-body"><span class="kw">---</span>
+<span class="flag">description:</span> <span class="str">Testing conventions</span>
+<span class="flag">globs:</span>
+  - <span class="str">"**/*.test.ts"</span>
+  - <span class="str">"**/*.spec.ts"</span>
+<span class="flag">alwaysApply:</span> <span class="val">false</span>
+<span class="kw">---</span>
+<span class="cm"># Testing Rules</span>
+- Use Vitest, not Jest
+- Colocate tests next to source
+- Never mock DB calls in E2E tests
+- Test command: <span class="str">npm run test:e2e</span></div>
+      </div>
+
+      <ul class="tip-list" style="margin-top:8px;">
+        <li>Keep <code>core.mdc</code> tiny — it loads on every prompt</li>
+        <li>Use <code>alwaysApply: false</code> + globs to trigger conditionally</li>
+        <li>Commit <code>.cursor/rules/</code> to Git — team shares the same AI behavior</li>
+        <li>Enable in Cursor: Settings → Rules → Project Rules</li>
+      </ul>
+    </div>
+
+    <!-- Caveman -->
+    <div class="card">
+      <div class="tool-pill pill-cave">⑤ Caveman · JuliusBrussee</div>
+      <h2><span class="icon">🪨</span> Response Compression (~75%)</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">A Cursor/Claude Code skill that instructs the AI to respond in compressed caveman-style language — dropping filler words and verbose phrasing while keeping full technical accuracy.</p>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;">Install (Cursor)</div>
+      <pre><span class="cm"># Copy caveman.mdc into your rules folder</span>
+curl -o .cursor/rules/caveman.mdc \
+  https://github.com/JuliusBrussee/caveman/raw/main/caveman.skill
+
+<span class="cm"># Or clone and copy manually</span>
+git clone https://github.com/JuliusBrussee/caveman
+cp caveman/caveman.skill .cursor/rules/caveman.mdc</pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">How It Works</div>
+      <pre><span class="cm"># Normal AI response:</span>
+<span class="str">"I will now proceed to refactor the authentication
+ middleware to use JWT tokens as you requested."</span>
+
+<span class="cm"># Caveman response (same meaning, 75% fewer tokens):</span>
+<span class="val">"Refactor auth middleware → JWT. Done."</span></pre>
+
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px;font-weight:700;">Activate Per Session</div>
+      <pre><span class="cm"># Reference it in your prompt or as always-apply rule</span>
+<span class="cm"># .cursor/rules/caveman.mdc frontmatter:</span>
+<span class="flag">alwaysApply:</span> <span class="val">true</span>   <span class="cm"># on for every response</span>
+<span class="flag">alwaysApply:</span> <span class="val">false</span>  <span class="cm"># manual: @caveman in prompt</span></pre>
+
+      <ul class="tip-list" style="margin-top:10px;">
+        <li>Works on AI <em>responses</em> — complements rtk which compresses tool <em>outputs</em></li>
+        <li>928 GitHub stars — widely validated in production</li>
+        <li>Zero dependencies — a single <code>.mdc</code> text file, nothing to install</li>
+        <li>Disable for final code reviews where full explanations matter</li>
+      </ul>
+    </div>
+
+  </div><!-- end grid-2 bottom row -->
+
+  <!-- Workflow Best Practices -->
+  <div class="section-label">Workflow Best Practices</div>
+  <div class="workflow-grid">
+
+    <!-- 1. Fresh agent per task -->
+    <div class="workflow-card wf-orange">
+      <span class="wf-number">1</span>
+      <span class="wf-icon">🔄</span>
+      <div class="wf-tag tag-orange">Context Hygiene</div>
+      <div class="wf-title">Start Fresh for Every Task</div>
+      <div class="wf-desc">Always open a new agent session for each new task or user story. Never build on top of a long context from a previous task.</div>
+      <ul class="wf-rules">
+        <li><span class="dot dot-orange"></span>One session = one task or user story</li>
+        <li><span class="dot dot-orange"></span>Long contexts cause hallucination &amp; forgotten instructions</li>
+        <li><span class="dot dot-orange"></span>Use byterover to carry knowledge between sessions instead</li>
+        <li><span class="dot dot-orange"></span><kbd style="background:#fff3ed;border:1px solid #fed7aa;border-radius:3px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:10px;">Cmd+N</kbd> → New Chat in Cursor</li>
+      </ul>
+    </div>
+
+    <!-- 2. Context length 50-70% -->
+    <div class="workflow-card wf-purple">
+      <span class="wf-number">2</span>
+      <span class="wf-icon">📊</span>
+      <div class="wf-tag tag-purple">Context Budget</div>
+      <div class="wf-title">Keep Context at 50–70% Max</div>
+      <div class="wf-desc">Monitor the context length indicator in Cursor. Once you hit 70%, quality degrades fast — reset before that happens.</div>
+      <div class="context-meter">
+        <div class="meter-track">
+          <div class="meter-safe"></div>
+          <div class="meter-warn"></div>
+          <div class="meter-danger"></div>
+        </div>
+        <div class="meter-labels">
+          <span class="safe-lbl">✓ 0–70% Safe zone</span>
+          <span class="warn-lbl">⚠ 70–85%</span>
+          <span class="reset-lbl">✗ 85%+ Reset now</span>
+        </div>
+      </div>
+      <ul class="wf-rules">
+        <li><span class="dot dot-purple"></span>Best results live in the 50–70% range</li>
+        <li><span class="dot dot-purple"></span>Above 70%: model starts forgetting early instructions</li>
+        <li><span class="dot dot-purple"></span>Curate key decisions to byterover before resetting</li>
+      </ul>
+    </div>
+
+    <!-- 3. Power prompt -->
+    <div class="workflow-card wf-blue">
+      <span class="wf-number">3</span>
+      <span class="wf-icon">⚡</span>
+      <div class="wf-tag tag-blue">Power Prompting</div>
+      <div class="wf-title">Pre-craft Prompts with AI Chat Tools</div>
+      <div class="wf-desc">Before sending a prompt to Cursor agent, use a chat tool to draft a compact, precise prompt. Don't waste agent tokens on vague instructions.</div>
+      <ul class="wf-rules">
+        <li><span class="dot dot-blue"></span>Describe your task in detail to <strong>ChatGPT</strong>, <strong>Groq</strong>, or <strong>Qwen</strong></li>
+        <li><span class="dot dot-blue"></span>Ask it: <em>"Write a compact Cursor agent prompt for this"</em></li>
+        <li><span class="dot dot-blue"></span>Copy the result into Cursor — shorter, cleaner, less context wasted</li>
+        <li><span class="dot dot-blue"></span>Groq is fastest for quick prompt rewrites (free tier)</li>
+      </ul>
+    </div>
+
+    <!-- 4. Plan mode before agent -->
+    <div class="workflow-card wf-green">
+      <span class="wf-number">4</span>
+      <span class="wf-icon">🗺️</span>
+      <div class="wf-tag tag-green">Plan Before Agent</div>
+      <div class="wf-title">Use Plan Mode First, Then Agent</div>
+      <div class="wf-desc">Always run Plan Mode to review the implementation approach before switching to Agent Mode. A bad plan wastes 5–15 model calls to undo.</div>
+      <ul class="wf-rules">
+        <li><span class="dot dot-green"></span>Toggle <strong>Plan Mode</strong> in the Cursor chat panel</li>
+        <li><span class="dot dot-green"></span>Review the plan — correct scope, files, and approach</li>
+        <li><span class="dot dot-green"></span>Only switch to <strong>Agent Mode</strong> once the plan is approved</li>
+        <li><span class="dot dot-green"></span>A single plan exchange costs far less than a failed agent run</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Quick reference row -->
+  <div class="section-label">Quick Reference</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:20px;margin-bottom:20px;">
+    <div class="card" style="padding:16px;">
+      <div style="font-size:11px;color:#60a5fa;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">RTK Top Commands</div>
+      <ul class="tip-list">
+        <li><code>rtk gain</code> — savings stats</li>
+        <li><code>rtk discover</code> — find missed savings</li>
+        <li><code>rtk smart file.rs</code> — 2-line summary</li>
+        <li><code>rtk diff f1 f2</code> — condensed diff</li>
+        <li><code>rtk proxy &lt;cmd&gt;</code> — raw passthrough</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px;">
+      <div style="font-size:11px;color:#86efac;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">code-parser Tips</div>
+      <ul class="tip-list">
+        <li>Use JSON map as codebase index</li>
+        <li>Reference map in <code>.cursorrules</code></li>
+        <li>Regenerate after big refactors</li>
+        <li>Combine with <code>@file</code> for precision</li>
+        <li>Avoids full file body in context</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px;">
+      <div style="font-size:11px;color:#fcd34d;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Byterover Tips</div>
+      <ul class="tip-list">
+        <li>Curate arch decisions immediately</li>
+        <li>Add tech stack &amp; DB choices</li>
+        <li>Curate recurring error patterns</li>
+        <li>Use <code>brv query</code> to verify retrieval</li>
+        <li>Review pending with <code>brv review pending</code></li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px;">
+      <div style="font-size:11px;color:#67e8f9;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">MDC Rule Types</div>
+      <ul class="tip-list">
+        <li><strong style="color:var(--text)">Always</strong> — every prompt (use sparingly)</li>
+        <li><strong style="color:var(--text)">Auto</strong> — when files match glob</li>
+        <li><strong style="color:var(--text)">Agent-requested</strong> — LLM pulls on demand</li>
+        <li><strong style="color:var(--text)">Manual</strong> — you attach explicitly</li>
+        <li>Mix types to minimize baseline cost</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:16px;">
+      <div style="font-size:11px;color:#fb923c;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Caveman Tips</div>
+      <ul class="tip-list">
+        <li>Enable globally in <code>core.mdc</code> for max savings</li>
+        <li>Disable for onboarding / documentation tasks</li>
+        <li>Stack with rtk for output + response compression</li>
+        <li>Single <code>.mdc</code> file — no binary needed</li>
+        <li>Works with Cursor, Claude Code, Windsurf</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span>Cursor Token Optimization Cheat Sheet · May 2026</span>
+    <div class="links">
+      <a href="https://github.com/rtk-ai/rtk" target="_blank">github.com/rtk-ai/rtk</a>
+      <a href="https://github.com/M97chahboun/code-parser" target="_blank">github.com/M97chahboun/code-parser</a>
+      <a href="https://www.byterover.dev" target="_blank">byterover.dev</a>
+      <a href="https://cursor.com/docs" target="_blank">cursor.com/docs</a>
+      <a href="https://github.com/JuliusBrussee/caveman" target="_blank">github.com/JuliusBrussee/caveman</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

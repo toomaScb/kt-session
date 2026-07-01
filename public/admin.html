@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Knowledge Transfer Sessions</title>
+  <script>
+  (function(){try{var s=localStorage.getItem('kt-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-wordmark">
+          <span class="logo-line">Transformation Office</span>
+          <span class="logo-title">Knowledge Sphere</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Sessions</a>
+        <a href="/calendar.html" class="nav-link">Calendar</a>
+        <a href="/submit.html" class="nav-link">Submit Session</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme">
+          <svg data-theme-icon="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg data-theme-icon="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Admin Dashboard</h2>
+        <div class="section-header-actions">
+          <button id="btn-export" class="btn btn-secondary">Export to Excel</button>
+          <button id="btn-logout" class="btn btn-secondary">Logout</button>
+        </div>
+      </div>
+
+      <div id="alert-success" class="alert alert-success" style="display: none;"></div>
+      <div id="alert-error" class="alert alert-error" style="display: none;"></div>
+
+      <div class="search-wrapper mb-lg">
+        <input type="text" id="search-input" class="search-input" placeholder="Search requests by title, presenter, subject, or audience...">
+      </div>
+
+      <h3 class="mb-md">Pending Requests</h3>
+      <div id="pending-requests" class="table-wrapper mb-lg">
+        <!-- Pending requests table -->
+      </div>
+
+      <h3 class="mb-md">All Requests</h3>
+      <div id="all-requests" class="table-wrapper">
+        <!-- All requests table -->
+      </div>
+    </div>
+  </section>
+
+  <!-- View Request Modal -->
+  <div id="modal-view" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title" id="modal-view-title">Request Details</h3>
+          <p class="modal-subtitle" id="modal-view-subtitle"></p>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-view')">&times;</button>
+      </div>
+      <div id="modal-view-content" class="modal-body">
+        <!-- Request details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Request Modal -->
+  <div id="modal-edit" class="modal-overlay">
+    <div class="modal" style="max-width: 640px;">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title">Edit session</h3>
+          <p class="modal-subtitle">Changes apply immediately for approved sessions on the public portal.</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-edit')">&times;</button>
+      </div>
+      <form id="form-edit-request" class="modal-body">
+        <input type="hidden" id="edit-id" name="id" value="">
+        <div class="form-group">
+          <label class="form-label" for="edit-title">Session Title *</label>
+          <input type="text" id="edit-title" name="title" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-subject">Subject *</label>
+          <input type="text" id="edit-subject" name="subject" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-presenter">Presenter Name *</label>
+          <input type="text" id="edit-presenter" name="presenter" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-dateTime">Date & Time *</label>
+          <input type="datetime-local" id="edit-dateTime" name="dateTime" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Audience *</label>
+          <div class="checkbox-group" id="edit-audience-group">
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Engineering"> Engineering</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Quality"> Quality</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Design"> Design</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Agile"> Agile</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Product"> Product</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="AI"> AI</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="Data"> Data</label>
+            <label class="checkbox-label"><input type="checkbox" name="edit-audience" value="General"> General</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-duration">Duration (minutes) *</label>
+          <input type="number" id="edit-duration" name="duration" class="form-input" min="1" max="480" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-location">Location *</label>
+          <input type="text" id="edit-location" name="location" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-topics">Topics / Contents</label>
+          <textarea id="edit-topics" name="topics" class="form-textarea" placeholder="Comma-separated topics"></textarea>
+          <span class="form-hint">Enter topics separated by commas</span>
+        </div>
+        <div class="modal-actions" style="margin-top: 1rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Feedback Modal -->
+  <div id="modal-view-feedback" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title">Session Feedback</h3>
+          <p class="modal-subtitle" id="modal-view-feedback-session-title"></p>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-view-feedback')">&times;</button>
+      </div>
+      <div id="modal-view-feedback-content" class="modal-body">
+        <!-- Feedback will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SCB Transformation Office Knowledge Sphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="/js/theme.js" defer></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

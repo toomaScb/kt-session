@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit KT Session - Knowledge Transfer Sessions</title>
+  <script>
+  (function(){try{var s=localStorage.getItem('kt-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-wordmark">
+          <span class="logo-line">Transformation Office</span>
+          <span class="logo-title">Knowledge Sphere</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Sessions</a>
+        <a href="/calendar.html" class="nav-link">Calendar</a>
+        <a href="/submit.html" class="nav-link active">Submit Session</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme">
+          <svg data-theme-icon="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg data-theme-icon="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container" style="max-width: 640px;">
+      <div class="section-header">
+        <h2 class="section-title">Submit Knowledge Transfer Session</h2>
+      </div>
+
+      <div id="alert-success" class="alert alert-success" style="display: none;">
+        Your request has been submitted successfully! It will be reviewed by an admin.
+      </div>
+
+      <div id="alert-error" class="alert alert-error" style="display: none;">
+        An error occurred. Please try again.
+      </div>
+
+      <form id="kt-form" class="card">
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="title">Session Title *</label>
+            <input type="text" id="title" name="title" class="form-input" placeholder="e.g., Introduction to Machine Learning" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="subject">Subject *</label>
+            <input type="text" id="subject" name="subject" class="form-input" placeholder="e.g., Machine Learning" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="presenter">Presenter Name *</label>
+            <input type="text" id="presenter" name="presenter" class="form-input" placeholder="e.g., John Smith" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="dateTime">Date & Time *</label>
+            <input type="datetime-local" id="dateTime" name="dateTime" class="form-input" required>
+            <span class="form-hint">Sessions cannot be scheduled on Egypt public holidays</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Target Audience *</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Engineering"> Engineering
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Quality"> Quality
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Design"> Design
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Agile"> Agile
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Product"> Product
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="AI"> AI
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="Data"> Data
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="audience" value="General"> General
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="duration">Duration (minutes) *</label>
+            <input type="number" id="duration" name="duration" class="form-input" placeholder="e.g., 60" min="15" max="480" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="location">Location *</label>
+            <input type="text" id="location" name="location" class="form-input" placeholder="e.g., Conference Room A / Zoom" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="topics">Topics / Contents</label>
+            <textarea id="topics" name="topics" class="form-textarea" placeholder="Enter topics separated by commas (e.g., Neural Networks, Supervised Learning, Model Training)"></textarea>
+            <span class="form-hint">Enter topics separated by commas</span>
+          </div>
+
+          <p class="form-hint" style="margin-bottom: 1rem;">Your submission is saved for review and will appear on the Sessions page only after it is approved.</p>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Session</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SCB Transformation Office Knowledge Sphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/theme.js" defer></script>
+  <script src="/js/submit.js"></script>
+</body>
+</html>

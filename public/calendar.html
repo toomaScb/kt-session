@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar - Transformation Office Knowledge Sphere</title>
+  <script>
+  (function(){try{var s=localStorage.getItem('kt-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/calendar.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-wordmark">
+          <span class="logo-line">Transformation Office</span>
+          <span class="logo-title">Knowledge Sphere</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Sessions</a>
+        <a href="/calendar.html" class="nav-link active">Calendar</a>
+        <a href="/submit.html" class="nav-link">Submit Session</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Theme">
+          <svg data-theme-icon="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg data-theme-icon="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero hero-small">
+    <div class="container">
+      <h1>Session Calendar</h1>
+      <p>View upcoming knowledge transfer sessions by date.</p>
+    </div>
+  </section>
+
+  <!-- Calendar Section -->
+  <section class="section">
+    <div class="container">
+      <div class="calendar-header">
+        <button id="prev-month" class="btn btn-circle" aria-label="Previous month">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h2 id="current-month" class="calendar-title"></h2>
+        <button id="next-month" class="btn btn-circle" aria-label="Next month">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="calendar-wrapper">
+        <div class="calendar-weekdays">
+          <div class="weekday">Sun</div>
+          <div class="weekday">Mon</div>
+          <div class="weekday">Tue</div>
+          <div class="weekday">Wed</div>
+          <div class="weekday">Thu</div>
+          <div class="weekday">Fri</div>
+          <div class="weekday">Sat</div>
+        </div>
+        <div id="calendar-grid" class="calendar-grid">
+          <!-- Calendar days will be rendered here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Day Sessions Panel -->
+  <div id="day-sessions-panel" class="day-sessions-panel">
+    <div class="day-sessions-header">
+      <div>
+        <h3 id="day-sessions-title">Sessions</h3>
+        <p id="day-sessions-date" class="day-sessions-subtitle"></p>
+      </div>
+      <button class="modal-close" onclick="closeDayPanel()">&times;</button>
+    </div>
+    <div id="day-sessions-content" class="day-sessions-content">
+      <!-- Sessions for selected day will be loaded here -->
+    </div>
+  </div>
+  <div id="day-panel-overlay" class="modal-overlay" onclick="closeDayPanel()"></div>
+
+  <!-- Session Detail Modal -->
+  <div id="modal-session" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h3 class="modal-title" id="modal-session-title">Session Details</h3>
+          <p class="modal-subtitle" id="modal-session-subtitle"></p>
+          <button type="button" class="btn btn-secondary btn-small" id="modal-download-png" onclick="downloadSessionModalPng()">Download as PNG</button>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-session')">&times;</button>
+      </div>
+      <div id="modal-session-content" class="modal-body">
+        <!-- Session details loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 SCB Transformation Office Knowledge Sphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/theme.js" defer></script>
+  <script src="/vendor/html-to-image.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/calendar.js"></script>
+</body>
+</html>
